@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free ATS Resume Checker | Optimize Your Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .score-ring {
+            transition: stroke-dashoffset 1s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .check-item {
+            transition: all 0.3s ease;
+        }
+
+        .check-item:hover {
+            transform: translateX(5px);
+        }
+
+        .drop-zone {
+            transition: all 0.3s ease;
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23667EEAFF' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+
+        .drop-zone.dragover {
+            background-color: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .drop-zone.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        .keyword-tag {
+            transition: all 0.2s ease;
+        }
+
+        .keyword-tag:hover {
+            transform: scale(1.05);
+        }
+
+        .section-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .role-chip {
+            transition: all 0.2s ease;
+        }
+
+        .role-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .role-chip.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .skill-bar {
+            transition: width 1s ease-out;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .success-message {
+            color: #059669;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2 rounded-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">ATS Checker Pro</h1>
+                    <p class="text-sm opacity-90">Free Resume Optimization Tool</p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                <span class="opacity-90">100% Free • No Registration • Privacy First</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+
+        <!-- Upload Section -->
+        <div id="uploadSection" class="slide-in">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Is Your Resume ATS-Friendly?</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Upload your resume and select your target job role or paste a job description for personalized
+                    keyword analysis.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                <!-- Resume Upload -->
+                <div class="glass-effect rounded-2xl p-8 shadow-xl">
+                    <label class="block text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Upload Your Resume
+                    </label>
+                    <div id="resumeDropZone"
+                        class="drop-zone rounded-2xl p-8 text-center cursor-pointer hover:bg-indigo-50 transition-colors">
+                        <input type="file" id="resumeInput" accept=".pdf,.doc,.docx,.txt" class="hidden">
+                        <div class="space-y-4">
+                            <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto">
+                                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-700 font-medium">Drop your resume here or click to browse</p>
+                                <p class="text-sm text-gray-500 mt-1">Supports PDF, DOCX, DOC, TXT (Max 5MB)</p>
+                            </div>
+                            <div id="resumeFileName"
+                                class="hidden text-indigo-600 font-semibold bg-indigo-50 py-2 px-4 rounded-lg inline-block">
+                            </div>
+                            <div id="uploadStatus"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Target Selection -->
+                <div class="glass-effect rounded-2xl p-8 shadow-xl">
+                    <label class="block text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Target Job (Optional)
+                    </label>
+
+                    <!-- Toggle Tabs -->
+                    <div class="flex bg-gray-100 rounded-lg p-1 mb-4">
+                        <button onclick="switchTab('role')" id="tabRole"
+                            class="tab-btn active flex-1 py-2 px-4 rounded-md text-sm font-medium text-center transition-all">
+                            Select Job Role
+                        </button>
+                        <button onclick="switchTab('description')" id="tabDescription"
+                            class="tab-btn flex-1 py-2 px-4 rounded-md text-sm font-medium text-center text-gray-600 transition-all">
+                            Paste Description
+                        </button>
+                    </div>
+
+                    <!-- Role Selection Panel -->
+                    <div id="rolePanel" class="space-y-4">
+                        <div class="relative">
+                            <input type="text" id="roleSearch"
+                                placeholder="Search job roles (e.g., Data Analyst, Software Engineer)..."
+                                class="w-full p-3 pl-10 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none"
+                                onkeyup="filterRoles()">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto" id="roleChips">
+                            <!-- Job roles will be populated here -->
+                        </div>
+
+                        <div id="selectedRoleDisplay"
+                            class="hidden mt-4 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs text-indigo-600 font-semibold uppercase">Selected Role</span>
+                                    <p id="selectedRoleName" class="font-bold text-gray-800"></p>
+                                </div>
+                                <button onclick="clearRole()" class="text-gray-400 hover:text-red-500">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description Panel -->
+                    <div id="descriptionPanel" class="hidden">
+                        <textarea id="jobDescription" rows="6"
+                            class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none resize-none text-gray-700"
+                            placeholder="Paste the full job description here for precise keyword matching..."></textarea>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mt-3 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Selecting a role suggests industry-specific keywords. Job description provides exact matching.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Analyze Button -->
+            <div class="text-center">
+                <button id="analyzeBtn" onclick="analyzeResume()" disabled
+                    class="bg-gray-300 text-gray-500 px-12 py-4 rounded-full font-bold text-lg transition-all cursor-not-allowed shadow-lg">
+                    Analyze Resume
+                </button>
+                <p id="uploadHint" class="text-sm text-gray-500 mt-3">Please upload your resume first</p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingSection" class="hidden text-center py-20">
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <div class="absolute inset-0 border-4 border-indigo-200 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin">
+                </div>
+                <svg class="absolute inset-0 m-auto w-10 h-10 text-indigo-600" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Analyzing Your Resume...</h3>
+            <p class="text-gray-600" id="loadingText">Checking formatting compatibility</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden space-y-6">
+
+            <!-- Score Overview -->
+            <div class="glass-effect rounded-2xl p-8 shadow-xl">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="flex items-center gap-8">
+                        <!-- Circular Score -->
+                        <div class="relative w-40 h-40">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"></circle>
+                                <circle id="scoreCircle" cx="80" cy="80" r="70" stroke="url(#gradient)"
+                                    stroke-width="12" fill="none" stroke-dasharray="440" stroke-dashoffset="440"
+                                    stroke-linecap="round" class="score-ring"></circle>
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="scoreValue" class="text-4xl font-bold text-gray-800">0</span>
+                                <span class="text-sm text-gray-500">ATS Score</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div id="targetRoleBadge" class="hidden mb-2">
+                                <span
+                                    class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold flex items-center inline-flex">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    Target: <span id="targetRoleName"></span>
+                                </span>
+                            </div>
+                            <h3 id="scoreTitle" class="text-2xl font-bold text-gray-800 mb-2">Analysis Complete</h3>
+                            <p id="scoreDescription" class="text-gray-600 max-w-md">Your resume has been analyzed
+                                against 15+ ATS compatibility factors.</p>
+                            <div class="flex gap-3 mt-4">
+                                <button onclick="resetAnalysis()"
+                                    class="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                        </path>
+                                    </svg>
+                                    Check Another Resume
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-3 gap-4 w-full md:w-auto">
+                        <div class="text-center p-4 bg-green-50 rounded-xl">
+                            <div id="passedChecks" class="text-2xl font-bold text-green-600">0</div>
+                            <div class="text-xs text-green-700 font-medium">Passed</div>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 rounded-xl">
+                            <div id="warningChecks" class="text-2xl font-bold text-yellow-600">0</div>
+                            <div class="text-xs text-yellow-700 font-medium">Warnings</div>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-xl">
+                            <div id="failedChecks" class="text-2xl font-bold text-red-600">0</div>
+                            <div class="text-xs text-red-700 font-medium">Critical</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Based Skills Match -->
+            <div id="roleSkillsSection"
+                class="hidden section-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                            </path>
+                        </svg>
+                        Role-Specific Skills Analysis
+                    </h4>
+                    <span id="roleMatchScore" class="text-2xl font-bold text-indigo-600">0%</span>
+                </div>
+
+                <div class="mb-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">Skills Match</span>
+                        <span id="skillsMatchText" class="font-semibold text-gray-800">0/0 skills found</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="skillsProgressBar" class="skill-bar bg-indigo-600 h-2.5 rounded-full"
+                            style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-2 flex items-center text-green-700">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Found in Resume
+                        </p>
+                        <div id="foundSkillsList" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-2 flex items-center text-red-600">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Missing Skills
+                        </p>
+                        <div id="missingSkillsList" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis Grid -->
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Format & Structure -->
+                <div class="section-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
+                                </path>
+                            </svg>
+                            Format & Structure
+                        </h4>
+                        <span id="formatScore" class="text-2xl font-bold text-blue-600">0%</span>
+                    </div>
+                    <div class="space-y-3" id="formatChecks"></div>
+                </div>
+
+                <!-- Content Quality -->
+                <div class="section-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Content Quality
+                        </h4>
+                        <span id="contentScore" class="text-2xl font-bold text-purple-600">0%</span>
+                    </div>
+                    <div class="space-y-3" id="contentChecks"></div>
+                </div>
+
+                <!-- Keywords Analysis -->
+                <div class="section-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-pink-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                </path>
+                            </svg>
+                            Keywords & Skills
+                        </h4>
+                        <span id="keywordScore" class="text-2xl font-bold text-pink-600">0%</span>
+                    </div>
+                    <div class="space-y-3" id="keywordChecks"></div>
+                    <div id="keywordMatches" class="mt-4 pt-4 border-t border-gray-100 hidden">
+                        <p class="text-sm font-semibold text-gray-700 mb-2">Matched Keywords:</p>
+                        <div id="matchedKeywordsList" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- ATS Compatibility -->
+                <div class="section-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ATS Readiness
+                        </h4>
+                        <span id="atsScore" class="text-2xl font-bold text-green-600">0%</span>
+                    </div>
+                    <div class="space-y-3" id="atsChecks"></div>
+                </div>
+            </div>
+
+            <!-- Improvement Recommendations -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Priority Improvements
+                </h3>
+                <div id="recommendationsList" class="space-y-4"></div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Pro Tips for ATS Success</h3>
+                <div class="grid md:grid-cols-3 gap-6 text-sm">
+                    <div class="flex items-start space-x-3">
+                        <div
+                            class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-blue-600 font-bold">
+                            1</div>
+                        <div>
+                            <p class="font-semibold text-gray-800">Use Standard Headings</p>
+                            <p class="text-gray-600 mt-1">Use "Work Experience" instead of "My Career Journey" for
+                                better parsing.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div
+                            class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-blue-600 font-bold">
+                            2</div>
+                        <div>
+                            <p class="font-semibold text-gray-800">Avoid Tables & Columns</p>
+                            <p class="text-gray-600 mt-1">ATS systems read left-to-right. Tables often get scrambled.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div
+                            class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-blue-600 font-bold">
+                            3</div>
+                        <div>
+                            <p class="font-semibold text-gray-800">Match Keywords Exactly</p>
+                            <p class="text-gray-600 mt-1">Mirror the job description language. If they say "Project
+                                Management", don't use "PM".</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">Free ATS Resume Checker - Open Source & Privacy Focused</p>
+            <p class="text-sm text-gray-500">Your resume is processed locally in your browser. No data is uploaded to
+                any server.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Job Role Database with Keywords - Custom List
+        const jobRoles = {
+            "Data Analyst": {
+                keywords: ["sql", "python", "r", "excel", "tableau", "power bi", "data visualization", "statistics", "data cleaning", "etl", "pandas", "numpy", "jupyter", "mysql", "postgresql", "data mining", "regression", "hypothesis testing", "a/b testing", "dashboard", "kpi", "reporting", "analytics", "business intelligence", "bi", "data warehousing", "snowflake", "bigquery"],
+                hardSkills: ["data analysis", "statistical analysis", "database management", "query optimization", "data modeling"],
+                softSkills: ["problem solving", "critical thinking", "communication", "attention to detail"]
+            },
+            "Business Analyst": {
+                keywords: ["requirements gathering", "process mapping", "stakeholder management", "jira", "confluence", "sql", "agile", "scrum", "user stories", "use cases", "gap analysis", "business process", "uml", "flowcharts", "documentation", "brd", "frd", " Tableau", "power bi", "excel", "visio", "salesforce", "crm", "erp"],
+                hardSkills: ["business analysis", "process improvement", "data analysis", "project management", "system analysis"],
+                softSkills: ["communication", "analytical thinking", "problem solving", "negotiation", "stakeholder management"]
+            },
+            "Operations Analyst": {
+                keywords: ["process improvement", "lean", "six sigma", "kpis", "supply chain", "logistics", "inventory management", "forecasting", "data analysis", "sql", "excel", "tableau", "erp", "sap", "oracle", "operations management", "workflow optimization", "quality control", "sla", "resource planning"],
+                hardSkills: ["operations analysis", "process mapping", "data modeling", "supply chain management", "quality assurance"],
+                softSkills: ["analytical thinking", "problem solving", "communication", "efficiency", "detail oriented"]
+            },
+            "Financial Analyst": {
+                keywords: ["financial modeling", "valuation", "dcf", "npv", "irr", "excel", "vba", "sql", "sap", "oracle", "quickbooks", "gaap", "ifrs", "financial statements", "balance sheet", "income statement", "cash flow", "budgeting", "forecasting", "variance analysis", "ratio analysis", "investment analysis", "portfolio management"],
+                hardSkills: ["financial analysis", "accounting", "data analysis", "forecasting", "financial reporting"],
+                softSkills: ["analytical thinking", "attention to detail", "integrity", "communication", "business acumen"]
+            },
+            "Cybersecurity Analyst": {
+                keywords: ["siem", "splunk", "firewall", "ids", "ips", "vulnerability assessment", "penetration testing", "incident response", "forensics", "malware analysis", "risk assessment", "compliance", "gdpr", "hipaa", "iso 27001", "nist", "cissp", "security+", "ceh", "aws security", "azure security", "network security", "cryptography", "owasp"],
+                hardSkills: ["network security", "threat analysis", "security assessment", "incident handling", "vulnerability management"],
+                softSkills: ["analytical thinking", "attention to detail", "integrity", "continuous learning", "problem solving"]
+            },
+            "Data Engineer": {
+                keywords: ["python", "sql", "spark", "hadoop", "kafka", "airflow", "dbt", "aws", "azure", "gcp", "etl", "elt", "data pipeline", "data warehousing", "snowflake", "redshift", "bigquery", "databricks", "postgresql", "mysql", "mongodb", "cassandra", "docker", "kubernetes", "terraform", "ci/cd"],
+                hardSkills: ["data pipeline development", "database design", "cloud computing", "big data technologies", "data modeling"],
+                softSkills: ["problem solving", "collaboration", "communication", "adaptability", "continuous learning"]
+            },
+            "Data Scientist": {
+                keywords: ["python", "r", "sql", "machine learning", "deep learning", "tensorflow", "pytorch", "scikit-learn", "pandas", "numpy", "jupyter", "statistics", "regression", "classification", "clustering", "nlp", "computer vision", "a/b testing", "feature engineering", "model deployment", "aws", "azure", "mlops"],
+                hardSkills: ["machine learning", "statistical modeling", "data mining", "predictive analytics", "algorithm development"],
+                softSkills: ["curiosity", "business acumen", "communication", "critical thinking", "creativity"]
+            },
+            "DevOps Engineer": {
+                keywords: ["aws", "azure", "gcp", "docker", "kubernetes", "jenkins", "gitlab ci", "github actions", "terraform", "ansible", "puppet", "chef", "python", "bash", "linux", "nginx", "apache", "prometheus", "grafana", "elk stack", "git", "ci/cd", "infrastructure as code", "microservices", "monitoring"],
+                hardSkills: ["cloud infrastructure", "automation", "containerization", "scripting", "system administration"],
+                softSkills: ["collaboration", "problem solving", "communication", "adaptability", "continuous improvement"]
+            },
+            "Graphic Designer": {
+                keywords: ["photoshop", "illustrator", "indesign", "figma", "sketch", "adobe xd", "after effects", "premiere pro", "typography", "color theory", "branding", "logo design", "layout design", "print design", "digital design", "ui design", "motion graphics", "vector graphics", "image editing", "visual communication"],
+                hardSkills: ["visual design", "brand identity", "print production", "digital media", "typography"],
+                softSkills: ["creativity", "attention to detail", "communication", "time management", "receptiveness to feedback"]
+            },
+            "UI/UX Designer": {
+                keywords: ["figma", "sketch", "adobe xd", "invision", "prototyping", "wireframing", "user research", "usability testing", "interaction design", "visual design", "design systems", "information architecture", "user flows", "personas", "journey mapping", "accessibility", "wcag", "responsive design", "mobile design", "html", "css"],
+                hardSkills: ["user interface design", "user experience design", "prototyping", "user research", "usability testing"],
+                softSkills: ["empathy", "communication", "problem solving", "creativity", "collaboration"]
+            },
+            "Full Stack Developer": {
+                keywords: ["javascript", "typescript", "python", "java", "node.js", "react", "angular", "vue", "html", "css", "sass", "bootstrap", "tailwind", "mongodb", "postgresql", "mysql", "redis", "graphql", "rest api", "docker", "aws", "azure", "git", "webpack", "jest", "cypress", "ci/cd"],
+                hardSkills: ["frontend development", "backend development", "database management", "api design", "cloud services"],
+                softSkills: ["problem solving", "continuous learning", "communication", "adaptability", "teamwork"]
+            },
+            "Human Resources": {
+                keywords: ["recruiting", "talent acquisition", "onboarding", "performance management", "employee relations", "hris", "workday", "bamboohr", "adp", "benefits administration", "compensation", "hr policies", "labor law", "diversity", "inclusion", "training", "succession planning", "org development", "conflict resolution"],
+                hardSkills: ["hr management", "recruitment", "employee engagement", "compliance", "data management"],
+                softSkills: ["communication", "empathy", "discretion", "interpersonal skills", "problem solving"]
+            },
+            "Marketing Manager": {
+                keywords: ["digital marketing", "seo", "sem", "google ads", "facebook ads", "linkedin ads", "content marketing", "email marketing", "marketing automation", "hubspot", "marketo", "salesforce", "google analytics", "social media", "brand management", "campaign management", "roi", "conversion optimization", "lead generation", "crm"],
+                hardSkills: ["marketing strategy", "campaign planning", "budget management", "analytics", "content strategy"],
+                softSkills: ["creativity", "leadership", "communication", "analytical thinking", "adaptability"]
+            },
+            "Project Manager": {
+                keywords: ["project planning", "project scheduling", "risk management", "stakeholder management", "agile", "scrum", "kanban", "waterfall", "pmp", "prince2", "jira", "asana", "monday.com", "ms project", "smartsheet", "budget management", "resource allocation", "change management", "status reporting", "milestones"],
+                hardSkills: ["project management", "schedule management", "budget control", "risk assessment", "team leadership"],
+                softSkills: ["leadership", "communication", "problem solving", "negotiation", "time management"]
+            },
+            "Project Engineer": {
+                keywords: ["project management", "engineering design", "cad", "autocad", "solidworks", "construction management", "site supervision", "quality control", "safety management", "cost estimation", "scheduling", "contract management", "technical documentation", "vendor management", "inspection", "commissioning"],
+                hardSkills: ["engineering principles", "project coordination", "technical design", "quality assurance", "cost control"],
+                softSkills: ["technical communication", "problem solving", "teamwork", "attention to detail", "time management"]
+            },
+            "Web Developer": {
+                keywords: ["html", "css", "javascript", "typescript", "react", "angular", "vue", "nodejs", "php", "python", "django", "flask", "wordpress", "shopify", "mongodb", "mysql", "postgresql", "rest api", "graphql", "git", "webpack", "sass", "bootstrap", "tailwind", "responsive design", "seo", "accessibility"],
+                hardSkills: ["frontend development", "backend integration", "database management", "web design", "api consumption"],
+                softSkills: ["problem solving", "continuous learning", "attention to detail", "communication", "creativity"]
+            },
+            "ML Engineer": {
+                keywords: ["python", "tensorflow", "pytorch", "scikit-learn", "keras", "mlflow", "kubeflow", "aws sagemaker", "azure ml", "gcp ai", "docker", "kubernetes", "feature engineering", "model deployment", "model monitoring", "a/b testing", "deep learning", "nlp", "computer vision", "reinforcement learning", "mLOps"],
+                hardSkills: ["machine learning", "model deployment", "software engineering", "cloud platforms", "data pipeline"],
+                softSkills: ["problem solving", "research orientation", "collaboration", "communication", "continuous learning"]
+            },
+            "Software Engineer/Developer": {
+                keywords: ["java", "python", "javascript", "c++", "c#", "go", "rust", "spring", "django", "flask", "react", "angular", "sql", "mongodb", "redis", "kafka", "rabbitmq", "docker", "kubernetes", "aws", "azure", "gcp", "git", "ci/cd", "microservices", "rest api", "graphql", "tdd", "agile"],
+                hardSkills: ["software development", "system design", "database design", "api development", "cloud computing"],
+                softSkills: ["problem solving", "logical thinking", "teamwork", "communication", "adaptability"]
+            },
+            "Mechanical Engineer": {
+                keywords: ["cad", "solidworks", "autocad", "catia", "nx", "fea", "cfd", "ansys", "abaqus", "matlab", "simulink", "gd&t", "dfm", "dfma", "lean manufacturing", "six sigma", "plm", "pdm", "thermal analysis", "fluid dynamics", "materials science", "prototyping", "3d printing", "cnc", "machining"],
+                hardSkills: ["mechanical design", "thermal analysis", "structural analysis", "manufacturing processes", "quality control"],
+                softSkills: ["problem solving", "analytical thinking", "teamwork", "communication", "attention to detail"]
+            },
+            "Sales Representative": {
+                keywords: ["crm", "salesforce", "hubspot", "cold calling", "lead generation", "prospecting", "pipeline management", "negotiation", "closing", "account management", "b2b sales", "b2c sales", "solution selling", "consultative selling", "sales presentations", "product demonstrations", "territory management", "quota achievement"],
+                hardSkills: ["sales techniques", "product knowledge", "market knowledge", "crm management", "presentation skills"],
+                softSkills: ["communication", "persuasion", "resilience", "empathy", "time management", "self-motivation"]
+            },
+            "Accountant": {
+                keywords: ["gaap", "ifrs", "tax preparation", "auditing", "bookkeeping", "financial statements", "balance sheet", "income statement", "cash flow", "reconciliation", "payroll", "accounts payable", "accounts receivable", "quickbooks", "sap", "oracle", "excel", "vba", "budgeting", "forecasting", "variance analysis", "cost accounting"],
+                hardSkills: ["financial reporting", "tax compliance", "audit procedures", "accounting software", "data analysis"],
+                softSkills: ["attention to detail", "integrity", "organization", "analytical thinking", "confidentiality"]
+            },
+            "Content Writer": {
+                keywords: ["seo writing", "copywriting", "blogging", "content strategy", "wordpress", "content management", "social media", "email marketing", "white papers", "case studies", "technical writing", "editing", "proofreading", "keyword research", "google analytics", "content calendar", "brand voice", "storytelling", "research"],
+                hardSkills: ["writing", "editing", "seo optimization", "content management systems", "research"],
+                softSkills: ["creativity", "adaptability", "attention to detail", "time management", "communication"]
+            },
+            "Customer Service": {
+                keywords: ["crm", "zendesk", "freshdesk", "salesforce service cloud", "ticketing systems", "live chat", "email support", "phone support", "conflict resolution", "de-escalation", "customer satisfaction", "retention", "upselling", "cross-selling", "product knowledge", "troubleshooting", "sla management", "quality assurance"],
+                hardSkills: ["customer support", "technical troubleshooting", "crm software", "data entry", "product knowledge"],
+                softSkills: ["patience", "empathy", "communication", "problem solving", "stress management", "positive attitude"]
+            }
+        };
+
+        let resumeText = '';
+        let fileName = '';
+        let selectedRole = null;
+        let isProcessing = false;
+        const loadingTexts = [
+            "Checking formatting compatibility...",
+            "Analyzing section structure...",
+            "Scanning for keywords...",
+            "Evaluating readability...",
+            "Comparing with role requirements...",
+            "Generating recommendations...",
+            "Calculating final score..."
+        ];
+
+        // Initialize role chips
+        function initializeRoles() {
+            const container = document.getElementById('roleChips');
+            const roles = Object.keys(jobRoles).sort();
+
+            container.innerHTML = roles.map(role => `
+                <button onclick="selectRole('${role}')" 
+                    class="role-chip px-4 py-2 bg-white border-2 border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                    data-role="${role}">
+                    ${role}
+                </button>
+            `).join('');
+        }
+
+        function filterRoles() {
+            const searchTerm = document.getElementById('roleSearch').value.toLowerCase();
+            const chips = document.querySelectorAll('.role-chip');
+
+            chips.forEach(chip => {
+                const role = chip.getAttribute('data-role').toLowerCase();
+                if (role.includes(searchTerm)) {
+                    chip.style.display = 'block';
+                } else {
+                    chip.style.display = 'none';
+                }
+            });
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+
+            // Update UI
+            document.querySelectorAll('.role-chip').forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.getAttribute('data-role') === role) {
+                    chip.classList.add('active');
+                }
+            });
+
+            // Show selected display
+            document.getElementById('selectedRoleDisplay').classList.remove('hidden');
+            document.getElementById('selectedRoleName').textContent = role;
+        }
+
+        function clearRole() {
+            selectedRole = null;
+            document.querySelectorAll('.role-chip').forEach(chip => chip.classList.remove('active'));
+            document.getElementById('selectedRoleDisplay').classList.add('hidden');
+            document.getElementById('roleSearch').value = '';
+            filterRoles();
+        }
+
+        function switchTab(tab) {
+            const rolePanel = document.getElementById('rolePanel');
+            const descPanel = document.getElementById('descriptionPanel');
+            const tabRole = document.getElementById('tabRole');
+            const tabDesc = document.getElementById('tabDescription');
+
+            if (tab === 'role') {
+                rolePanel.classList.remove('hidden');
+                descPanel.classList.add('hidden');
+                tabRole.classList.add('active');
+                tabRole.classList.remove('text-gray-600');
+                tabDesc.classList.remove('active');
+                tabDesc.classList.add('text-gray-600');
+            } else {
+                rolePanel.classList.add('hidden');
+                descPanel.classList.remove('hidden');
+                tabDesc.classList.add('active');
+                tabDesc.classList.remove('text-gray-600');
+                tabRole.classList.remove('active');
+                tabRole.classList.add('text-gray-600');
+            }
+        }
+
+        // File Upload Handling
+        const dropZone = document.getElementById('resumeDropZone');
+        const fileInput = document.getElementById('resumeInput');
+        const fileNameDisplay = document.getElementById('resumeFileName');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const uploadHint = document.getElementById('uploadHint');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) handleFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        async function handleFile(file) {
+            if (isProcessing) return;
+
+            // Reset states
+            resumeText = '';
+            fileName = file.name;
+            fileNameDisplay.textContent = `📄 ${file.name}`;
+            fileNameDisplay.classList.remove('hidden');
+            uploadStatus.innerHTML = '<span class="success-message"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing file...</span>';
+
+            isProcessing = true;
+            const extension = file.name.split('.').pop().toLowerCase();
+
+            try {
+                let extractedText = '';
+
+                if (extension === 'pdf') {
+                    extractedText = await extractPDFText(file);
+                } else if (extension === 'docx') {
+                    extractedText = await extractDOCXText(file);
+                } else if (extension === 'doc') {
+                    extractedText = await extractDOCText(file);
+                } else if (extension === 'txt') {
+                    extractedText = await extractTXTText(file);
+                } else {
+                    throw new Error('Unsupported file format');
+                }
+
+                if (!extractedText || extractedText.trim().length === 0) {
+                    throw new Error('No text could be extracted from file');
+                }
+
+                resumeText = extractedText;
+
+                // Success - enable analyze button
+                uploadStatus.innerHTML = '<span class="success-message"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> File loaded successfully!</span>';
+                analyzeBtn.disabled = false;
+                analyzeBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                analyzeBtn.classList.add('gradient-bg', 'text-white', 'hover:opacity-90', 'transform', 'hover:scale-105');
+                uploadHint.textContent = 'Ready to analyze! Click the button below.';
+                uploadHint.classList.remove('text-gray-500');
+                uploadHint.classList.add('text-green-600');
+
+                // Remove error styling if present
+                dropZone.classList.remove('error');
+
+            } catch (error) {
+                console.error('File processing error:', error);
+                uploadStatus.innerHTML = `<span class="error-message"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Error: ${error.message}</span>`;
+                dropZone.classList.add('error');
+                analyzeBtn.disabled = true;
+                uploadHint.textContent = 'Please try a different file (DOCX or TXT work best)';
+                uploadHint.classList.add('text-red-600');
+            } finally {
+                isProcessing = false;
+            }
+        }
+
+        async function extractPDFText(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let text = '';
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    text += content.items.map(item => item.str).join(' ') + '\n';
+                }
+
+                if (!text.trim()) {
+                    throw new Error('PDF appears to be scanned image or corrupted');
+                }
+
+                return text;
+            } catch (error) {
+                throw new Error(`PDF reading failed: ${error.message}`);
+            }
+        }
+
+        async function extractDOCXText(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                return result.value;
+            } catch (error) {
+                throw new Error(`DOCX reading failed: ${error.message}`);
+            }
+        }
+
+        async function extractDOCText(file) {
+            // For .doc files, we'll try to read as text but may be limited
+            try {
+                const text = await file.text();
+                return text;
+            } catch (error) {
+                throw new Error('Old .doc format not supported. Please save as .docx');
+            }
+        }
+
+        async function extractTXTText(file) {
+            return await file.text();
+        }
+
+        // Analysis Function
+        async function analyzeResume() {
+            if (!resumeText || isProcessing) {
+                alert('Please wait for file to finish processing or upload a valid file');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('uploadSection').classList.add('hidden');
+            document.getElementById('loadingSection').classList.remove('hidden');
+
+            // Simulate loading steps
+            for (let i = 0; i < loadingTexts.length; i++) {
+                document.getElementById('loadingText').textContent = loadingTexts[i];
+                await new Promise(resolve => setTimeout(resolve, 400));
+            }
+
+            try {
+                // Perform analysis
+                const jobDesc = document.getElementById('jobDescription').value;
+                const results = performAnalysis(resumeText, jobDesc, selectedRole);
+
+                // Display results
+                displayResults(results);
+
+                document.getElementById('loadingSection').classList.add('hidden');
+                document.getElementById('resultsSection').classList.remove('hidden');
+                document.getElementById('resultsSection').classList.add('slide-in');
+            } catch (error) {
+                console.error('Analysis error:', error);
+                alert('Error during analysis. Please try again.');
+                resetAnalysis();
+            }
+        }
+
+        function performAnalysis(text, jobDesc, role) {
+            const checks = {
+                format: [],
+                content: [],
+                keywords: [],
+                ats: []
+            };
+
+            const lowerText = text.toLowerCase();
+
+            // Format Checks
+            const hasTables = /<\s*table|{\s*\\trowd|\\table/.test(text) || text.includes('┌') || text.includes('├');
+            checks.format.push({
+                name: "No Complex Tables",
+                status: !hasTables ? 'pass' : 'fail',
+                message: hasTables ? "Tables detected - ATS may scramble content" : "No problematic tables found"
+            });
+
+            const hasColumns = text.includes('│') || text.includes('┃') || /(\S+\s{3,}\S+\s{3,})/.test(text);
+            checks.format.push({
+                name: "Single Column Layout",
+                status: !hasColumns ? 'pass' : 'warning',
+                message: hasColumns ? "Possible column layout detected" : "Single column format verified"
+            });
+
+            const standardFonts = /Arial|Calibri|Times New Roman|Helvetica|Georgia/.test(text);
+            checks.format.push({
+                name: "Standard Fonts",
+                status: standardFonts ? 'pass' : 'warning',
+                message: standardFonts ? "Standard ATS-friendly fonts detected" : "Consider using Arial, Calibri, or Times New Roman"
+            });
+
+            // Content Checks
+            const wordCount = text.split(/\s+/).length;
+            const hasEnoughContent = wordCount > 200;
+            checks.content.push({
+                name: "Content Length",
+                status: hasEnoughContent ? 'pass' : 'warning',
+                message: hasEnoughContent ? `${wordCount} words - Good length` : `${wordCount} words - Consider adding more details`
+            });
+
+            const sections = ['experience', 'education', 'skills'];
+            const foundSections = sections.filter(section => lowerText.includes(section));
+            checks.content.push({
+                name: "Standard Sections",
+                status: foundSections.length >= 3 ? 'pass' : 'warning',
+                message: `Found: ${foundSections.join(', ') || 'None detected'}`
+            });
+
+            const bulletPoints = (text.match(/[•\-–—]\s/g) || []).length;
+            checks.content.push({
+                name: "Bullet Points Usage",
+                status: bulletPoints > 5 ? 'pass' : 'warning',
+                message: bulletPoints > 5 ? `${bulletPoints} bullet points found` : "Add more bullet points for readability"
+            });
+
+            const hasNumbers = /\d+%|\$\d+|\d+ years|increased|decreased|improved|reduced/i.test(text);
+            checks.content.push({
+                name: "Quantified Achievements",
+                status: hasNumbers ? 'pass' : 'fail',
+                message: hasNumbers ? "Metrics and numbers found" : "Add specific numbers/metrics (e.g., 'Increased sales by 20%')"
+            });
+
+            // Keyword Analysis - Role-based or Job Description
+            let keywordResults = {
+                matched: [],
+                missing: [],
+                score: 0,
+                source: ''
+            };
+
+            if (jobDesc) {
+                // Job Description matching
+                const jobWords = jobDesc.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
+                const uniqueJobWords = [...new Set(jobWords)].filter(w =>
+                    !['with', 'from', 'have', 'that', 'this', 'will', 'your', 'must', 'should', 'able', 'work'].includes(w)
+                );
+                const matchedJobWords = uniqueJobWords.filter(w => lowerText.includes(w)).slice(0, 15);
+
+                keywordResults = {
+                    matched: matchedJobWords,
+                    missing: uniqueJobWords.filter(w => !lowerText.includes(w)).slice(0, 10),
+                    score: Math.min(100, (matchedJobWords.length / Math.max(5, uniqueJobWords.length * 0.3)) * 100),
+                    source: 'job description'
+                };
+
+                checks.keywords.push({
+                    name: "Job Description Match",
+                    status: matchedJobWords.length > 5 ? 'pass' : matchedJobWords.length > 2 ? 'warning' : 'fail',
+                    message: `${matchedJobWords.length} keywords matched from job description`
+                });
+            } else if (role && jobRoles[role]) {
+                // Role-based matching
+                const roleData = jobRoles[role];
+                const allRoleKeywords = [...roleData.keywords, ...roleData.hardSkills.map(s => s.toLowerCase())];
+                const matched = allRoleKeywords.filter(kw => lowerText.includes(kw.toLowerCase()));
+                const missing = allRoleKeywords.filter(kw => !lowerText.includes(kw.toLowerCase()));
+
+                keywordResults = {
+                    matched: matched,
+                    missing: missing.slice(0, 8),
+                    score: (matched.length / allRoleKeywords.length) * 100,
+                    source: 'role',
+                    roleData: roleData
+                };
+
+                checks.keywords.push({
+                    name: `${role} Skills Match`,
+                    status: matched.length > 8 ? 'pass' : matched.length > 4 ? 'warning' : 'fail',
+                    message: `${matched.length} of ${allRoleKeywords.length} key skills found`
+                });
+            } else {
+                // Generic keyword check
+                const commonKeywords = ['management', 'development', 'analysis', 'project', 'team', 'leadership',
+                    'communication', 'strategic', 'operations', 'technical', 'design', 'marketing', 'sales'];
+                const foundKeywords = commonKeywords.filter(kw => lowerText.includes(kw));
+
+                keywordResults = {
+                    matched: foundKeywords,
+                    missing: [],
+                    score: (foundKeywords.length / commonKeywords.length) * 100,
+                    source: 'generic'
+                };
+
+                checks.keywords.push({
+                    name: "Industry Keywords",
+                    status: foundKeywords.length > 5 ? 'pass' : 'warning',
+                    message: `${foundKeywords.length} common industry keywords found`
+                });
+            }
+
+            // ATS Compatibility
+            const hasContactInfo = /[\w.-]+@[\w.-]+\.\w+|\(\d{3}\)\s*\d{3}[-.]?\d{4}|\d{3}[-.]?\d{3}[-.]?\d{4}/.test(text);
+            checks.ats.push({
+                name: "Contact Information",
+                status: hasContactInfo ? 'pass' : 'fail',
+                message: hasContactInfo ? "Email/phone detected" : "Add clear contact information"
+            });
+
+            const hasSpecialChars = /[^\w\s@.\-–—(),/%&+|:]/.test(text.replace(/[•]/g, ''));
+            checks.ats.push({
+                name: "Special Characters",
+                status: !hasSpecialChars ? 'pass' : 'warning',
+                message: hasSpecialChars ? "Some special characters may not parse correctly" : "Clean character set"
+            });
+
+            const fileType = fileName.split('.').pop().toLowerCase();
+            checks.ats.push({
+                name: "File Format",
+                status: ['docx', 'pdf', 'txt'].includes(fileType) ? 'pass' : 'warning',
+                message: fileType === 'pdf' ? "PDF format (ensure it's text-based)" :
+                    fileType === 'docx' ? "DOCX format (Excellent)" : "Text format"
+            });
+
+            // Calculate scores
+            const calculateScore = (checkList) => {
+                const passWeight = 100 / checkList.length;
+                return Math.round(checkList.reduce((acc, check) => {
+                    if (check.status === 'pass') return acc + passWeight;
+                    if (check.status === 'warning') return acc + (passWeight * 0.5);
+                    return acc;
+                }, 0));
+            };
+
+            return {
+                format: { score: calculateScore(checks.format), checks: checks.format },
+                content: { score: calculateScore(checks.content), checks: checks.content },
+                keywords: { score: Math.round(keywordResults.score), checks: checks.keywords, details: keywordResults },
+                ats: { score: calculateScore(checks.ats), checks: checks.ats },
+                overall: Math.round((calculateScore(checks.format) + calculateScore(checks.content) +
+                    keywordResults.score + calculateScore(checks.ats)) / 4),
+                role: role,
+                jobDesc: jobDesc
+            };
+        }
+
+        function displayResults(results) {
+            animateValue('scoreValue', 0, results.overall, 1500);
+
+            const circle = document.getElementById('scoreCircle');
+            const circumference = 440;
+            const offset = circumference - (results.overall / 100) * circumference;
+            setTimeout(() => {
+                circle.style.strokeDashoffset = offset;
+            }, 100);
+
+            // Show role badge if selected
+            if (results.role) {
+                document.getElementById('targetRoleBadge').classList.remove('hidden');
+                document.getElementById('targetRoleName').textContent = results.role;
+            }
+
+            // Score title and description
+            const scoreTitle = document.getElementById('scoreTitle');
+            const scoreDesc = document.getElementById('scoreDescription');
+            if (results.overall >= 80) {
+                scoreTitle.textContent = "Excellent ATS Compatibility!";
+                scoreTitle.className = "text-2xl font-bold text-green-600 mb-2";
+                scoreDesc.textContent = results.role ?
+                    `Your resume is well-optimized for ${results.role} positions.` :
+                    "Your resume is well-optimized for ATS systems.";
+            } else if (results.overall >= 60) {
+                scoreTitle.textContent = "Good with Room for Improvement";
+                scoreTitle.className = "text-2xl font-bold text-yellow-600 mb-2";
+                scoreDesc.textContent = "Your resume will pass most ATS systems, but addressing the issues below will improve your chances.";
+            } else {
+                scoreTitle.textContent = "Needs Significant Improvement";
+                scoreTitle.className = "text-2xl font-bold text-red-600 mb-2";
+                scoreDesc.textContent = "Your resume may be rejected by ATS systems. Follow the recommendations below to fix critical issues.";
+            }
+
+            // Update stats
+            let passed = 0, warnings = 0, failed = 0;
+            [...results.format.checks, ...results.content.checks, ...results.keywords.checks, ...results.ats.checks].forEach(check => {
+                if (check.status === 'pass') passed++;
+                else if (check.status === 'warning') warnings++;
+                else failed++;
+            });
+            animateValue('passedChecks', 0, passed, 1000);
+            animateValue('warningChecks', 0, warnings, 1000);
+            animateValue('failedChecks', 0, failed, 1000);
+
+            // Display category scores
+            document.getElementById('formatScore').textContent = results.format.score + '%';
+            document.getElementById('contentScore').textContent = results.content.score + '%';
+            document.getElementById('keywordScore').textContent = results.keywords.score + '%';
+            document.getElementById('atsScore').textContent = results.ats.score + '%';
+
+            // Render checks
+            renderChecks('formatChecks', results.format.checks);
+            renderChecks('contentChecks', results.content.checks);
+            renderChecks('keywordChecks', results.keywords.checks);
+            renderChecks('atsChecks', results.ats.checks);
+
+            // Display role-specific skills section if role was selected
+            if (results.role && results.keywords.details.source === 'role') {
+                document.getElementById('roleSkillsSection').classList.remove('hidden');
+                const details = results.keywords.details;
+
+                document.getElementById('roleMatchScore').textContent = Math.round(details.score) + '%';
+                document.getElementById('skillsMatchText').textContent = `${details.matched.length} of ${details.matched.length + details.missing.length} key skills`;
+                document.getElementById('skillsProgressBar').style.width = details.score + '%';
+
+                document.getElementById('foundSkillsList').innerHTML = details.matched.map(skill =>
+                    `<span class="keyword-tag bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">${skill}</span>`
+                ).join('');
+
+                document.getElementById('missingSkillsList').innerHTML = details.missing.map(skill =>
+                    `<span class="keyword-tag bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">${skill}</span>`
+                ).join('');
+            } else {
+                document.getElementById('roleSkillsSection').classList.add('hidden');
+            }
+
+            // Display matched keywords if job description was used
+            if (results.jobDesc && results.keywords.details.matched.length > 0) {
+                document.getElementById('keywordMatches').classList.remove('hidden');
+                document.getElementById('matchedKeywordsList').innerHTML = results.keywords.details.matched.map(kw =>
+                    `<span class="keyword-tag bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">${kw}</span>`
+                ).join('');
+            }
+
+            generateRecommendations(results);
+        }
+
+        function renderChecks(containerId, checks) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = checks.map(check => {
+                const icon = check.status === 'pass' ?
+                    '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' :
+                    check.status === 'warning' ?
+                        '<svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>' :
+                        '<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+
+                const bgColor = check.status === 'pass' ? 'bg-green-50' : check.status === 'warning' ? 'bg-yellow-50' : 'bg-red-50';
+
+                return `
+                    <div class="check-item flex items-start space-x-3 p-3 rounded-lg ${bgColor}">
+                        <div class="flex-shrink-0 mt-0.5">${icon}</div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-800 text-sm">${check.name}</p>
+                            <p class="text-xs text-gray-600 mt-1">${check.message}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function generateRecommendations(results) {
+            const recommendations = [];
+
+            const allChecks = [
+                ...results.format.checks.map(c => ({ ...c, category: 'Format' })),
+                ...results.content.checks.map(c => ({ ...c, category: 'Content' })),
+                ...results.keywords.checks.map(c => ({ ...c, category: 'Keywords' })),
+                ...results.ats.checks.map(c => ({ ...c, category: 'ATS' }))
+            ].filter(c => c.status !== 'pass');
+
+            allChecks.sort((a, b) => {
+                if (a.status === 'fail' && b.status === 'warning') return -1;
+                if (a.status === 'warning' && b.status === 'fail') return 1;
+                return 0;
+            });
+
+            // Add role-specific recommendation if applicable
+            if (results.role && results.keywords.details.missing.length > 0) {
+                const missingTop = results.keywords.details.missing.slice(0, 3).join(', ');
+                recommendations.push({
+                    category: 'Role Match',
+                    status: 'fail',
+                    name: `Missing ${results.role} Skills`,
+                    message: `Add these key skills to your resume: ${missingTop}. Consider creating a dedicated "Skills" section.`
+                });
+            }
+
+            const topIssues = [...recommendations, ...allChecks].slice(0, 5);
+
+            const container = document.getElementById('recommendationsList');
+            if (topIssues.length === 0) {
+                container.innerHTML = `
+                    <div class="flex items-center space-x-3 bg-white/10 rounded-lg p-4">
+                        <svg class="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="font-semibold">Great job!</p>
+                            <p class="text-sm opacity-90">No critical issues found. Your resume is ATS-ready!</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = topIssues.map((issue, idx) => `
+                    <div class="flex items-start space-x-4 bg-white/10 rounded-lg p-4 hover:bg-white/20 transition-colors">
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+                            ${idx + 1}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="text-xs font-bold uppercase tracking-wider opacity-75">${issue.category}</span>
+                                <span class="text-xs ${issue.status === 'fail' ? 'text-red-200' : 'text-yellow-200'} font-semibold">
+                                    ${issue.status === 'fail' ? 'Critical' : 'Warning'}
+                                </span>
+                            </div>
+                            <p class="font-semibold text-lg">${issue.name}</p>
+                            <p class="text-sm opacity-90 mt-1">${issue.message}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+
+            function run() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                obj.innerHTML = value;
+                if (value == end) {
+                    clearInterval(timer);
+                }
+            }
+
+            timer = setInterval(run, stepTime);
+            run();
+        }
+
+        function resetAnalysis() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('uploadSection').classList.remove('hidden');
+            document.getElementById('resumeInput').value = '';
+            document.getElementById('jobDescription').value = '';
+            document.getElementById('resumeFileName').classList.add('hidden');
+            document.getElementById('uploadStatus').innerHTML = '';
+            document.getElementById('targetRoleBadge').classList.add('hidden');
+            document.getElementById('resumeDropZone').classList.remove('error');
+            clearRole();
+            analyzeBtn.disabled = true;
+            analyzeBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            analyzeBtn.classList.remove('gradient-bg', 'text-white', 'hover:opacity-90', 'transform', 'hover:scale-105');
+            uploadHint.textContent = 'Please upload your resume first';
+            uploadHint.classList.remove('text-green-600', 'text-red-600');
+            uploadHint.classList.add('text-gray-500');
+            resumeText = '';
+            fileName = '';
+            selectedRole = null;
+            isProcessing = false;
+        }
+
+        // Initialize
+        initializeRoles();
+
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
+    </script>
+</body>
+
+</html>

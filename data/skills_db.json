@@ -1,0 +1,457 @@
+{
+  "Data Analyst": {
+    "keywords": [
+      "sql",
+      "python",
+      "excel",
+      "tableau",
+      "power bi",
+      "data visualization",
+      "statistics",
+      "data cleaning",
+      "etl",
+      "pandas",
+      "numpy",
+      "jupyter",
+      "mysql",
+      "postgresql",
+      "data mining",
+      "regression",
+      "hypothesis testing",
+      "dashboard",
+      "kpi",
+      "reporting",
+      "analytics",
+      "business intelligence",
+      "data warehousing",
+      "snowflake",
+      "bigquery",
+      "vlookup",
+      "pivot table"
+    ],
+    "phrases": [
+      "data analysis",
+      "statistical analysis",
+      "database management",
+      "query optimization",
+      "data modeling",
+      "data visualization",
+      "business intelligence",
+      "a/b testing",
+      "root cause analysis"
+    ],
+    "synonyms": {
+      "bi": "business intelligence",
+      "sql": "structured query language",
+      "js": "javascript"
+    }
+  },
+  "Business Analyst": {
+    "keywords": [
+      "jira",
+      "confluence",
+      "sql",
+      "agile",
+      "scrum",
+      "uml",
+      "flowcharts",
+      "documentation",
+      "brd",
+      "frd",
+      "tableau",
+      "power bi",
+      "excel",
+      "visio",
+      "salesforce",
+      "crm",
+      "erp"
+    ],
+    "phrases": [
+      "requirements gathering",
+      "process mapping",
+      "stakeholder management",
+      "user stories",
+      "use cases",
+      "gap analysis",
+      "business process",
+      "business analysis",
+      "process improvement",
+      "system analysis",
+      "project management"
+    ],
+    "synonyms": {
+      "brd": "business requirements document",
+      "frd": "functional requirements document",
+      "uml": "unified modeling language"
+    }
+  },
+  "QA Analyst": {
+    "keywords": [
+      "jira",
+      "selenium",
+      "postman",
+      "sql",
+      "agile",
+      "scrum",
+      "bdd",
+      "tdd",
+      "automation",
+      "regression",
+      "defect",
+      "junit",
+      "testng",
+      "cucumber",
+      "api"
+    ],
+    "phrases": [
+      "test case design",
+      "defect logging",
+      "test automation framework",
+      "api testing",
+      "regression testing",
+      "test plan",
+      "requirement analysis",
+      "bug tracking",
+      "quality assurance",
+      "manual testing",
+      "functional testing"
+    ],
+    "synonyms": {
+      "bdd": "behavior driven development",
+      "tdd": "test driven development",
+      "qa": "quality assurance"
+    }
+  },
+  "QA Engineer": {
+    "keywords": [
+      "selenium",
+      "cypress",
+      "postman",
+      "jenkins",
+      "git",
+      "java",
+      "python",
+      "sql",
+      "junit",
+      "testng",
+      "cucumber",
+      "api",
+      "jira",
+      "docker",
+      "ci/cd"
+    ],
+    "phrases": [
+      "test automation",
+      "framework development",
+      "continuous integration",
+      "api testing",
+      "performance testing",
+      "load testing",
+      "test scripting",
+      "code review",
+      "quality assurance"
+    ],
+    "synonyms": {
+      "ci/cd": "continuous integration continuous deployment"
+    }
+  },
+  "Data Engineer": {
+    "keywords": [
+      "python",
+      "sql",
+      "spark",
+      "hadoop",
+      "kafka",
+      "airflow",
+      "aws",
+      "azure",
+      "gcp",
+      "snowflake",
+      "redshift",
+      "bigquery",
+      "databricks",
+      "postgresql",
+      "mongodb",
+      "docker",
+      "kubernetes",
+      "etl"
+    ],
+    "phrases": [
+      "data pipeline",
+      "data warehousing",
+      "database design",
+      "cloud computing",
+      "big data",
+      "data modeling",
+      "batch processing",
+      "stream processing"
+    ],
+    "synonyms": {
+      "etl": "extract transform load",
+      "aws": "amazon web services",
+      "gcp": "google cloud platform"
+    }
+  },
+  "Data Scientist": {
+    "keywords": [
+      "python",
+      "r",
+      "sql",
+      "tensorflow",
+      "pytorch",
+      "scikit-learn",
+      "pandas",
+      "numpy",
+      "jupyter",
+      "statistics",
+      "regression",
+      "classification",
+      "clustering",
+      "nlp"
+    ],
+    "phrases": [
+      "machine learning",
+      "statistical modeling",
+      "data mining",
+      "predictive analytics",
+      "feature engineering",
+      "model deployment",
+      "a/b testing",
+      "deep learning",
+      "computer vision"
+    ],
+    "synonyms": {
+      "nlp": "natural language processing",
+      "ml": "machine learning"
+    }
+  },
+  "Junior Data Scientist": {
+    "keywords": [
+      "python",
+      "sql",
+      "pandas",
+      "numpy",
+      "scikit-learn",
+      "matplotlib",
+      "seaborn",
+      "jupyter",
+      "statistics",
+      "excel",
+      "power bi"
+    ],
+    "phrases": [
+      "exploratory data analysis",
+      "machine learning",
+      "data cleaning",
+      "model building",
+      "statistical analysis",
+      "data visualization",
+      "hypothesis testing"
+    ],
+    "synonyms": {
+      "eda": "exploratory data analysis",
+      "ml": "machine learning"
+    }
+  },
+  "MIS Executive": {
+    "keywords": [
+      "excel",
+      "vlookup",
+      "pivot table",
+      "macros",
+      "vba",
+      "sql",
+      "power bi",
+      "sap",
+      "erp",
+      "tally",
+      "reporting"
+    ],
+    "phrases": [
+      "management information system",
+      "data entry",
+      "report generation",
+      "data consolidation",
+      "dashboard creation",
+      "process automation",
+      "record maintenance"
+    ],
+    "synonyms": {
+      "mis": "management information system",
+      "vba": "visual basic for applications"
+    }
+  },
+  "Operations Analyst": {
+    "keywords": [
+      "excel",
+      "sql",
+      "tableau",
+      "power bi",
+      "erp",
+      "sap",
+      "kpi",
+      "forecasting"
+    ],
+    "phrases": [
+      "process improvement",
+      "supply chain management",
+      "inventory management",
+      "data analysis",
+      "workflow optimization",
+      "quality control",
+      "resource planning",
+      "operations management"
+    ],
+    "synonyms": {
+      "sla": "service level agreement"
+    }
+  },
+  "Research Analyst": {
+    "keywords": [
+      "excel",
+      "spss",
+      "sql",
+      "python",
+      "r",
+      "survey",
+      "statistics"
+    ],
+    "phrases": [
+      "market research",
+      "data collection",
+      "statistical analysis",
+      "report writing",
+      "literature review",
+      "survey design",
+      "competitive analysis",
+      "trend analysis"
+    ],
+    "synonyms": {
+      "spss": "statistical package for the social sciences"
+    }
+  },
+  "Product Analyst": {
+    "keywords": [
+      "sql",
+      "excel",
+      "python",
+      "tableau",
+      "power bi",
+      "mixpanel",
+      "amplitude",
+      "jira"
+    ],
+    "phrases": [
+      "product analytics",
+      "user behavior analysis",
+      "a/b testing",
+      "funnel analysis",
+      "cohort analysis",
+      "requirement gathering",
+      "feature prioritization",
+      "kpi tracking"
+    ],
+    "synonyms": {}
+  },
+  "Software Engineer": {
+    "keywords": [
+      "java",
+      "python",
+      "javascript",
+      "c++",
+      "sql",
+      "git",
+      "docker",
+      "aws",
+      "react",
+      "node.js",
+      "spring",
+      "rest"
+    ],
+    "phrases": [
+      "software development",
+      "object oriented programming",
+      "system design",
+      "api development",
+      "unit testing",
+      "version control",
+      "agile methodology"
+    ],
+    "synonyms": {
+      "oop": "object oriented programming",
+      "api": "application programming interface"
+    }
+  },
+  "Associate Software Engineer": {
+    "keywords": [
+      "java",
+      "python",
+      "sql",
+      "git",
+      "html",
+      "css",
+      "javascript",
+      "react",
+      "spring boot"
+    ],
+    "phrases": [
+      "software development",
+      "debugging",
+      "unit testing",
+      "version control",
+      "object oriented programming",
+      "problem solving",
+      "agile methodology"
+    ],
+    "synonyms": {
+      "oop": "object oriented programming"
+    }
+  },
+  "Logistics Analyst": {
+    "keywords": [
+      "excel",
+      "sql",
+      "sap",
+      "erp",
+      "power bi",
+      "wms",
+      "tms"
+    ],
+    "phrases": [
+      "supply chain management",
+      "inventory management",
+      "demand forecasting",
+      "route optimization",
+      "warehouse management",
+      "vendor management",
+      "logistics coordination",
+      "shipment tracking"
+    ],
+    "synonyms": {
+      "wms": "warehouse management system",
+      "tms": "transportation management system"
+    }
+  },
+  "HR Analyst": {
+    "keywords": [
+      "excel",
+      "hris",
+      "workday",
+      "sql",
+      "power bi",
+      "sap"
+    ],
+    "phrases": [
+      "hr analytics",
+      "employee data management",
+      "attrition analysis",
+      "payroll processing",
+      "recruitment tracking",
+      "workforce planning",
+      "compensation analysis"
+    ],
+    "synonyms": {
+      "hris": "human resource information system"
+    }
+  }
+}
